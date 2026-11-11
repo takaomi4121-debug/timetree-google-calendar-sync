@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { loadConfig } from "./config.js";
 import { parseIcsFile } from "./ics-parser.js";
@@ -69,20 +69,19 @@ function exportFromTimeTree(config: {
   timetreeCalendarCode: string;
   icsFilePath: string;
 }): void {
-  const cmd = [
-    "timetree-exporter",
-    "-e", config.timetreeEmail,
-    "-c", config.timetreeCalendarCode,
-    "-o", config.icsFilePath,
-  ].join(" ");
+ const args = [
+  "-e", config.timetreeEmail,
+  "-c", config.timetreeCalendarCode,
+  "-o", config.icsFilePath,
+];
 
-  execSync(cmd, {
-    env: {
-      ...process.env,
-      TIMETREE_PASSWORD: config.timetreePassword,
-    },
-    stdio: "inherit",
-  });
+execFileSync("timetree-exporter", args, {
+  env: {
+    ...process.env,
+    TIMETREE_PASSWORD: config.timetreePassword,
+  },
+  stdio: "inherit",
+});
 }
 
 main().catch((err) => {
