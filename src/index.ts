@@ -36,6 +36,7 @@ async function main(): Promise<void> {
   // 6. 差分計算
   const engine = new SyncEngine(gcal);
   const diff = engine.computeDiff(events, syncedEvents);
+  diff.toDelete = [];
   console.log(
     `\nDiff: ${diff.toCreate.length} to create, ${diff.toUpdate.length} to update, ${diff.toDelete.length} to delete`
   );
