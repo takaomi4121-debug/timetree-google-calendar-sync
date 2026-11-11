@@ -1,9 +1,17 @@
+
 name: Sync TimeTree to Google Calendar
 
 on:
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: timetree-calendar-sync
+  cancel-in-progress: false
 
 jobs:
   sync:
@@ -32,14 +40,37 @@ jobs:
         run: npm ci
 
       - name: Decode Google credentials
-        run: echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 }}" | base64 -d > /tmp/google-credentials.json
+        env:
+          GOOGLE_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 }}
+        run: |
+          test -n "$GOOGLE_KEY"
+          printf '%s' "$GOOGLE_KEY" | base64 -d > /tmp/google-credentials.json
+          python -m json.tool /tmp/google-credentials.json > /dev/null
 
-      - name: Run sync
+      - name: Sync Plan
         env:
           TIMETREE_EMAIL: ${{ secrets.TIMETREE_EMAIL }}
           TIMETREE_PASSWORD: ${{ secrets.TIMETREE_PASSWORD }}
-          TIMETREE_CALENDAR_CODE: ${{ secrets.TIMETREE_CALENDAR_CODE }}
-          GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID }}
+          TIMETREE_CALENDAR_CODE: ${{ secrets.TIMETREE_CODE_PLAN }}
+          GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID_PLAN }}
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/google-credentials.json
+        run: npx tsx src/index.ts
+
+      - name: Sync long-term
+        env:
+          TIMETREE_EMAIL: ${{ secrets.TIMETREE_EMAIL }}
+          TIMETREE_PASSWORD: ${{ secrets.TIMETREE_PASSWORD }}
+          TIMETREE_CALENDAR_CODE: ${{ secrets.TIMETREE_CODE_LONGTERM }}
+          GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID_LONGTERM }}
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/google-credentials.json
+        run: npx tsx src/index.ts
+
+      - name: Sync SGE Twitter
+        env:
+          TIMETREE_EMAIL: ${{ secrets.TIMETREE_EMAIL }}
+          TIMETREE_PASSWORD: ${{ secrets.TIMETREE_PASSWORD }}
+          TIMETREE_CALENDAR_CODE: ${{ secrets.TIMETREE_CODE_SGE }}
+          GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID_SGE }}
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/google-credentials.json
         run: npx tsx src/index.ts
 
