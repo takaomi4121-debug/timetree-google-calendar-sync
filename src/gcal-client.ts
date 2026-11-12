@@ -71,7 +71,15 @@ export class GCalClient {
     googleEventId: string,
     event: CalendarEvent
   ): Promise<void> {
-    const body = this.toGCalEvent(event);
+    
+if (event.allDay) {
+  Object.assign(body.start!, { dateTime: null, timeZone: null });
+  Object.assign(body.end!, { dateTime: null, timeZone: null });
+} else {
+  Object.assign(body.start!, { date: null });
+  Object.assign(body.end!, { date: null });
+}
+
     await this.calendar.events.patch({
       calendarId: this.calendarId,
       eventId: googleEventId,
