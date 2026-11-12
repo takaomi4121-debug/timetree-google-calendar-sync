@@ -38,11 +38,14 @@ export class GCalClient {
       for (const item of res.data.items ?? []) {
         const props = item.extendedProperties?.private ?? {};
         if (props.timetreeUid && item.id) {
-          events.push({
-            googleEventId: item.id,
-            timetreeUid: props.timetreeUid,
-            lastModified: props.timetreeLastModified ?? "",
-          });
+          
+events.push({
+  googleEventId: item.id,
+  timetreeUid: props.timetreeUid,
+  lastModified: props.timetreeLastModified ?? "",
+  summary: item.summary ?? "",
+});
+
         }
       }
 
