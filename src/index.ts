@@ -57,9 +57,17 @@ if (diff.toDelete.length > 5) {
 
 console.log(`Deletion candidates: ${diff.toDelete.length}`);
 
+
 for (const item of diff.toDelete) {
-  console.log(`Deletion candidate UID: ${item.timetreeUid}`);
+  const matched = syncedEvents.find(
+    (event) => event.timetreeUid === item.timetreeUid
+  );
+
+  console.log(
+    `Deletion candidate: ${matched?.summary ?? "(no title)"} | UID: ${item.timetreeUid}`
+  );
 }
+
 
 
 diff.toDelete = [];
