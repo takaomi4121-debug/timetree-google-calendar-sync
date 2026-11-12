@@ -35,8 +35,28 @@ async function main(): Promise<void> {
 
   // 6. 差分計算
   const engine = new SyncEngine(gcal);
-  const diff = engine.computeDiff(events, syncedEvents);
-  diff.toDelete = [];
+  
+const diff = engine.computeDiff(events, syncedEvents);
+
+// Safety: stop if the source calendar is unexpectedly small.
+if (
+  syncedEvents.length >= 20 &&
+  events.length < syncedEvents.length * 0.9
+) {
+  throw new Error(
+    `Safety stop: source events dropped from ${syncedEvents.length} to ${events.length}`
+  );
+}
+
+// Safety: never delete more than 5 events in one run.
+if (diff.toDelete.length > 5) {
+  throw new Error(
+    `Safety stop: ${diff.toDelete.length} deletions requested (maximum 5)`
+  );
+}
+
+console.log(`Deletion candidates: ${diff.toDelete.length}`);
+diff.toDelete = [];
   console.log(
     `\nDiff: ${diff.toCreate.length} to create, ${diff.toUpdate.length} to update, ${diff.toDelete.length} to delete`
   );
