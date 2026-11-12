@@ -12,11 +12,14 @@ export interface CalendarEvent {
 }
 
 /** Google Calendar に同期済みのイベント情報 */
+
 export interface SyncedEvent {
   googleEventId: string;
   timetreeUid: string;
-  lastModified: string; // ISO string
+  lastModified: string;
+  summary?: string;
 }
+
 
 /** 差分計算の結果 */
 export interface SyncDiff {
