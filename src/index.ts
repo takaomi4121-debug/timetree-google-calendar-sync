@@ -56,10 +56,18 @@ if (diff.toDelete.length > 5) {
 }
 
 console.log(`Deletion candidates: ${diff.toDelete.length}`);
+
+for (const item of diff.toDelete) {
+  console.log(`Deletion candidate UID: ${item.timetreeUid}`);
+}
+
+
 diff.toDelete = [];
-  console.log(
-    `\nDiff: ${diff.toCreate.length} to create, ${diff.toUpdate.length} to update, ${diff.toDelete.length} to delete`
-  );
+
+console.log(
+  `\nDiff: ${diff.toCreate.length} to create, ${diff.toUpdate.length} to update, ${diff.toDelete.length} to delete`
+);
+
 
   // 7. 差分適用
   if (
