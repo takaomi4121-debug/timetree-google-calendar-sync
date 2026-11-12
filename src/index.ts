@@ -70,7 +70,7 @@ for (const item of diff.toDelete) {
 
 
 
-diff.toDelete = [];
+
 
 console.log(
   `\nDiff: ${diff.toCreate.length} to create, ${diff.toUpdate.length} to update, ${diff.toDelete.length} to delete`
