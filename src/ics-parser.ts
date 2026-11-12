@@ -41,17 +41,29 @@ function parameterValueToString(value: ParameterValue | undefined): string {
   return value.val;
 }
 
-function extractRecurrence(vevent: VEvent): string[] {
+
+function extractRecurrence(event: VEvent): string[] {
   const rules: string[] = [];
 
-  if (vevent.rrule) {
-    const rruleStr = vevent.rrule.toString();
-    if (rruleStr) {
-      rules.push(
-        rruleStr.startsWith("RRULE:") ? rruleStr : `RRULE:${rruleStr}`
-      );
+  if (event.rrule) {
+    const raw = event.rrule.toString();
+
+    const lines = raw
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    const rrule = lines.find((line) => line.startsWith("RRULE:"));
+
+    if (rrule) {
+      rules.push(rrule);
+    } else if (raw.trim().startsWith("FREQ=")) {
+      rules.push(`RRULE:${raw.trim()}`);
+    } else {
+      throw new Error(`Cannot parse recurrence rule for event ${event.uid}`);
     }
   }
 
   return rules;
 }
+
